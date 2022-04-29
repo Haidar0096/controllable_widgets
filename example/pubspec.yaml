@@ -36,7 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   controllable_widgets:
-    git: https://github.com/Haidar0096/controllable_widgets.git
+    git:
+      url: https://github.com/Haidar0096/controllable_widgets.git
+      ref: master
 
 dev_dependencies:
   flutter_test:

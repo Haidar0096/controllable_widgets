@@ -43,6 +43,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.15.0"
+  controllable_widgets:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "46978f7d9a88cba850ff39683fa4be0db1b182f2"
+      url: "https://github.com/Haidar0096/controllable_widgets.git"
+    source: git
+    version: "0.0.1"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -172,3 +181,4 @@ packages:
     version: "2.1.1"
 sdks:
   dart: ">=2.16.2 <3.0.0"
+  flutter: ">=1.17.0"
