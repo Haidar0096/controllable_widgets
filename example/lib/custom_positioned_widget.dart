@@ -43,6 +43,8 @@ class Home extends StatelessWidget {
                 // you can use it to place your widget
                 // return the offset you like for the top left of the container
                 // now we will return the current offset + the delta
+                // Just be careful if you set canGoOffParentBounds to false, as this will prevent the widget from being painted outside the parent
+                // but it WILL NOT prevent the offset from being updated to be outside parent, you should handle this in this case!
                 return currentBuilder.call(containerSize) + details.delta;
               };
             },
