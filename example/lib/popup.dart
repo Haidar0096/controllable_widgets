@@ -96,7 +96,7 @@ class _HomeState extends State<Home> {
                           _likes++; // to update the normal widgets
                         });
                         state(
-                                () {}); // to update the popup, because it is on the overlay (different context)
+                            () {}); // to update the popup, because it is on the overlay (different context)
                       },
                       child: _card(),
                     ),
@@ -186,7 +186,7 @@ class _HomeState extends State<Home> {
                 flex: 30,
                 child: RichText(
                   text:
-                  TextSpan(style: const TextStyle(fontSize: 20), children: [
+                      TextSpan(style: const TextStyle(fontSize: 20), children: [
                     const TextSpan(text: 'Name:\t'),
                     const TextSpan(
                         text: 'Dash', style: TextStyle(color: Colors.yellow)),
