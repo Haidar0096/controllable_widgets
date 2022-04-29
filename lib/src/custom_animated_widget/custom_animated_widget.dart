@@ -25,7 +25,7 @@ typedef TransitionBuilder = Widget Function(
 /// A Widget that handles animations for its child. Transition durations and curves can be provided to customize the animation.
 ///
 /// The provided [CustomAnimatedWidgetController] can be used to control the animation programmatically.
-class CustomAnimatedWidget extends StatefulWidget {
+class CustomAnimatedWidget extends StatelessWidget {
   /// The widget to be animated.
   final Widget child;
 
@@ -50,7 +50,9 @@ class CustomAnimatedWidget extends StatefulWidget {
   /// Whether the widget starts with animation when inserted into the tree.
   final bool initiallyAnimating;
 
-  const CustomAnimatedWidget({
+  final GlobalKey<CustomAnimatedWidgetState_> _key = GlobalKey();
+
+  CustomAnimatedWidget({
     Key? key,
     required this.child,
     required this.controller,
@@ -71,10 +73,50 @@ class CustomAnimatedWidget extends StatefulWidget {
         super(key: key);
 
   @override
-  State<CustomAnimatedWidget> createState() => CustomAnimatedWidgetState();
+  Widget build(BuildContext context) {
+    return CustomAnimatedWidget_(
+      key: controller._registerKey(_key),
+      controller: controller,
+      transitionBuilder: transitionBuilder,
+      transitionDuration: transitionDuration,
+      reverseTransitionDuration: reverseTransitionDuration,
+      transitionCurve: transitionCurve,
+      reverseTransitionCurve: reverseTransitionCurve,
+      initiallyAnimating: initiallyAnimating,
+      child: child,
+    );
+  }
 }
 
-class CustomAnimatedWidgetState extends State<CustomAnimatedWidget>
+// ignore: camel_case_types
+class CustomAnimatedWidget_ extends StatefulWidget {
+  final Widget child;
+  final CustomAnimatedWidgetController controller;
+  final TransitionBuilder transitionBuilder;
+  final Duration transitionDuration;
+  final Duration reverseTransitionDuration;
+  final Curve transitionCurve;
+  final Curve reverseTransitionCurve;
+  final bool initiallyAnimating;
+
+  const CustomAnimatedWidget_({
+    Key? key,
+    required this.controller,
+    required this.transitionBuilder,
+    required this.transitionDuration,
+    required this.reverseTransitionDuration,
+    required this.transitionCurve,
+    required this.reverseTransitionCurve,
+    required this.initiallyAnimating,
+    required this.child,
+  }) : super(key: key);
+
+  @override
+  State<CustomAnimatedWidget_> createState() => CustomAnimatedWidgetState_();
+}
+
+// ignore: camel_case_types
+class CustomAnimatedWidgetState_ extends State<CustomAnimatedWidget_>
     with SingleTickerProviderStateMixin {
   late final AnimationController animationController;
 
@@ -91,8 +133,6 @@ class CustomAnimatedWidgetState extends State<CustomAnimatedWidget>
     } else {
       animationController.value = 1.0;
     }
-
-    widget.controller._setAnimationController(animationController);
   }
 
   @override

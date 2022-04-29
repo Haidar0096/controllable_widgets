@@ -42,6 +42,7 @@ void main() {
           1);
       expect(find.byType(Container), findsOneWidget);
     });
+
     testWidgets(
         'Should not animate when inserted into a tree if initiallyAnimating is false.',
         (WidgetTester tester) async {
@@ -69,6 +70,7 @@ void main() {
           1);
       expect(find.byType(Container), findsOneWidget);
     });
+
     testWidgets('Can control a custom animated widget with the controller.',
         (WidgetTester tester) async {
       final CustomAnimatedWidgetController controller =
@@ -147,49 +149,17 @@ void main() {
       expect(tester.widget<ScaleTransition>(find.byKey(key)).scale.value, 1);
       expect(find.byType(Container), findsOneWidget);
     });
+
     testWidgets('Widget should dispose the animationController',
         (WidgetTester tester) async {
-      final GlobalKey<CustomAnimatedWidgetState> key = GlobalKey();
-
-      late final AnimationController controller;
-
-      // create the app
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CustomAnimatedWidget(
-              key: key,
-              child: Container(),
-              controller: CustomAnimatedWidgetController(),
-            ),
-          ),
-        ),
-      );
-
-      controller = key.currentState!.animationController;
-
-      // force dispose the widget
-      await tester.pumpWidget(const MaterialApp());
-
-      expect(key.currentState, null);
-      expect(() => controller.forward(), throwsAssertionError);
-    });
-    testWidgets(
-        'Should register the animationController when attached to a CustomAnimatedWidget.',
-        (WidgetTester tester) async {
-      final GlobalKey<CustomAnimatedWidgetState> key = GlobalKey();
-
       final CustomAnimatedWidgetController customAnimatedWidgetController =
           CustomAnimatedWidgetController();
 
-      late final AnimationController animationController;
-
       // create the app
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: CustomAnimatedWidget(
-              key: key,
               child: Container(),
               controller: customAnimatedWidgetController,
             ),
@@ -197,74 +167,160 @@ void main() {
         ),
       );
 
-      animationController = key.currentState!.animationController;
+      // hold a reference to the animationController so that garbage collector does not collect it later
+      final AnimationController controller =
+          customAnimatedWidgetController.animationController!;
 
-      expect(customAnimatedWidgetController.animationController,
-          animationController);
+      // force dispose the widget
+      await tester.pumpWidget(const MaterialApp());
+
+      expect(() => controller.forward(), throwsAssertionError);
     });
-  });
 
-  group('CustomAnimatedWidgetController', () {
-    testWidgets('Must not be used with more than one widget.',
+    testWidgets(
+        'Should register the animationController when attached to a CustomAnimatedWidget.',
         (WidgetTester tester) async {
-      final CustomAnimatedWidgetController controller =
+      final CustomAnimatedWidgetController customAnimatedWidgetController =
           CustomAnimatedWidgetController();
 
-      const String expectedErrorMessage =
-          'The CustomAnimatedWidgetController must only be used with one widget. Use a new controller if you want to control another widget.';
-      String? errorMessage;
+      expect(customAnimatedWidgetController.animationController, isNull);
 
-      FlutterError.onError = (FlutterErrorDetails details){
-        if(details.exceptionAsString().contains(expectedErrorMessage)){
-          errorMessage = expectedErrorMessage;
-        }
-      };
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Column(
-            children: [
-              CustomAnimatedWidget(
-                child: Container(),
-                controller: controller,
-              ),
-              CustomAnimatedWidget(
-                child: Container(),
-                controller: controller,
-              ),
-            ],
-          ),
-        ),
-      );
-
-      expect(errorMessage,expectedErrorMessage);
-
-    });
-    testWidgets('Must return the correct animationController',
-        (WidgetTester tester) async {
-      // when the controller is attached to a widget in the tree
-      final CustomAnimatedWidgetController controller =
-          CustomAnimatedWidgetController();
-
-      final GlobalKey<CustomAnimatedWidgetState> key = GlobalKey();
-
+      // create the app
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: CustomAnimatedWidget(
-              key: key,
               child: Container(),
-              controller: controller,
+              controller: customAnimatedWidgetController,
             ),
           ),
         ),
       );
 
-      expect(key.currentState!.animationController,
-          controller.animationController!);
+      expect(customAnimatedWidgetController.animationController, isNotNull);
+    });
+
+    testWidgets(
+        'Can not use the same controller with more than one widget at same time.',
+        (WidgetTester tester) async {
+      final CustomAnimatedWidgetController customAnimatedWidgetController =
+          CustomAnimatedWidgetController();
+
+      expect(customAnimatedWidgetController.animationController, isNull);
+
+      const String errorMessage =
+          'A GlobalKey can only be specified on one widget at a time in the widget tree.';
+      String? expectedMessage;
+
+      final currentHandler = FlutterError.onError;
+
+      FlutterError.onError = (FlutterErrorDetails details) {
+        if (details.exceptionAsString().contains(errorMessage)) {
+          expectedMessage = errorMessage;
+        }
+      };
+
+      // create the app
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                CustomAnimatedWidget(
+                  child: Container(),
+                  controller: customAnimatedWidgetController,
+                ),
+                CustomAnimatedWidget(
+                  child: Container(),
+                  controller: customAnimatedWidgetController,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      FlutterError.onError = currentHandler;
+      expect(errorMessage, expectedMessage);
+    });
+
+    testWidgets(
+        'Using the same controller on another widget does not control that widget.',
+        (WidgetTester tester) async {
+      final CustomAnimatedWidgetController customAnimatedWidgetController =
+          CustomAnimatedWidgetController();
+
+      expect(customAnimatedWidgetController.animationController, isNull);
+
+      // create the app
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CustomAnimatedWidget(
+              child: Container(),
+              controller: customAnimatedWidgetController,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(customAnimatedWidgetController.animationController!.value, 1);
+
+      // create another widget with same controller
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CustomAnimatedWidget(
+              child: Container(),
+              controller: customAnimatedWidgetController,
+              transitionDuration: const Duration(milliseconds: 100),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump(const Duration(milliseconds: 30));
+
+      // animationController's value doesn't change because the new widget is not registered with this controller
+      expect(customAnimatedWidgetController.animationController!.value, 1);
+    });
+
+    testWidgets('Must set animationController correctly',
+        (WidgetTester tester) async {
+      // when the controller is attached to a widget in the tree
+      final CustomAnimatedWidgetController controller =
+          CustomAnimatedWidgetController();
+
+      expect(controller.animationController, isNull);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CustomAnimatedWidget(
+              child: Container(),
+              controller: controller,
+              transitionDuration: const Duration(milliseconds: 100),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(scale: animation, child: child);
+              },
+            ),
+          ),
+        ),
+      );
+
+      final AnimationController animationController1 =
+          controller.animationController!;
+
+      // make sure the controller is animating
+      await tester.pump(const Duration(milliseconds: 33));
+
+      expect(animationController1.value, 0.33);
 
       // wait for animations to finish
       await tester.pumpAndSettle();
+
+      expect(animationController1.value, 1.0);
 
       // when the controller is not attached to a widget
       final CustomAnimatedWidgetController controller2 =
