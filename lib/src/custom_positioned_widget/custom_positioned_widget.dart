@@ -38,6 +38,7 @@ class CustomPositionedWidget extends StatefulWidget {
   /// contain the child.
   final Size? maxSize;
 
+  /// Creates a [CustomPositionedWidget]. See the class documentation for details.
   const CustomPositionedWidget({
     Key? key,
     required this.child,
