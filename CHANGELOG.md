@@ -9,3 +9,7 @@
 # 0.0.1+2 [Documentation Update]
 
 * Update documentation.
+
+# 0.0.1+3 [Documentation Update]
+
+* Update documentation (fixed README.md links).

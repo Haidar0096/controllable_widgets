@@ -6,7 +6,7 @@
 - Show **any** widget (popup) **anywhere** on the screen.
 - Customize entrance and leaving transitions of the popup content, as well as the durations and curves.
 - Support for limiting your popup inside the visible screen area if you choose to do so.
-  ![Alt Text](https://github.com/Haidar0096/controllable_widgets/blob/master/screenshots/demo.gif?raw=true)
+  ![Alt Text](https://github.com/Haidar0096/controllable_widgets/blob/master/screenshots/popup_demo2.gif?raw=true)
 
 ### Custom Animated Widget:
 - A widget that animates, and is controllable! Specify your child widget and animations, and Voila, you've got a controllable animated widget!
