@@ -1,6 +1,6 @@
 name: controllable_widgets
-description: A set of imperatively controllable widgets that make your life easier. The widgets take care of disposing resources, you just create the widget and controller and enjoy!
-version: 0.0.1+1
+description: Show a popup widget, an animated widget, etc... anywhere on screen. Control the position, animation, and properties of these widgets with a controller.
+version: 0.0.1+2
 homepage: https://github.com/Haidar0096/controllable_widgets
 repository: https://github.com/Haidar0096/controllable_widgets
 documentation: https://github.com/Haidar0096/controllable_widgets
